@@ -108,6 +108,8 @@ if Client then
         local sSavedBadge = Client.GetOptionString("Badge", "")
         if sBadgeExists(sSavedBadge) and Client.GetIsConnected() then
             Client.SendNetworkMessage("Badge", { badge = kBadges[sSavedBadge] }, true)
+        else 
+            Client.SetOptionString("Badge", "") 
         end
     end
     Event.Hook("LoadComplete", OnLoadComplete)
