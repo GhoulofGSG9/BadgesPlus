@@ -91,9 +91,9 @@ if Client then
         if message.clientIndex == -1 then
             local sBadge = kBadges[message.badge]
             table.insert(sServerBadges, sBadge)
-            -- default to first badge if we haven't selected one
-            if Client.GetOptionString("Badge", "") == "" then
-                Print("Default Badge: " .. sBadge)
+            -- activate saved badge or by default the first one which client gets from server
+            if Client.GetOptionString("Badge", "") == "" or Client.GetOptionString("Badge", "") == tostring(sBadge) then
+                Client.SetOptionString("Badge", "")
                 Shared.ConsoleCommand("badge " .. sBadge)
             end
         else
