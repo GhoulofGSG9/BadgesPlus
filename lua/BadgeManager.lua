@@ -1,7 +1,6 @@
 Script.Load("lua/Badges_Shared.lua")
 Script.Load("lua/dkjson.lua") -- necessary because the library is not loaded when this script is loaded in ns2stats
 local kBadgeServerUrl = "http://ns2c.herokuapp.com/"
-local kPAX2012ProductId = 4931
 
 -- Load all badge images. Custom badges will be loaded through here
 do
