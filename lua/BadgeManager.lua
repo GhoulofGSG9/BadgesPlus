@@ -90,10 +90,10 @@ if Client then
     local function OnReceiveBadge(message)
         if message.clientIndex == -1 then
             local sBadge = kBadges[message.badge]
-            table.insert(sServerBadges, sBadge)
-            -- activate saved badge or by default the first one which client gets from server
-            if Client.GetOptionString("Badge", "") == "" or Client.GetOptionString("Badge", "") == tostring(sBadge) then
-                Client.SetOptionString("Badge", "")
+            table.insert(sServerBadges, sBadge)            
+            -- default to first badge if we haven't selected one
+            if Client.GetOptionString("Badge", "") == "" then
+                Print("Default Badge: " .. sBadge)                
                 Shared.ConsoleCommand("badge " .. sBadge)
             end
         else
@@ -108,6 +108,8 @@ if Client then
         local sSavedBadge = Client.GetOptionString("Badge", "")
         if sBadgeExists(sSavedBadge) and Client.GetIsConnected() then
             Client.SendNetworkMessage("Badge", { badge = kBadges[sSavedBadge] }, true)
+        else 
+            Client.SetOptionString("Badge", "") 
         end
     end
     Event.Hook("LoadComplete", OnLoadComplete)
