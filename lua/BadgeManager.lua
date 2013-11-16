@@ -89,12 +89,11 @@ if Client then
     local function OnReceiveBadge(message)
         if message.clientIndex == -1 then
             local sBadge = kBadges[message.badge]
-            table.insert(sServerBadges, sBadge)            
+            table.insert(sServerBadges, sBadge)
             -- default to first badge if we haven't selected one
             if Client.GetOptionString("Badge", "") == "" then
-                Print("Default Badge: " .. sBadge)                
-                Shared.ConsoleCommand("badge " .. sBadge)
-            end
+                Shared.ConsoleCommand("badge \"" .. sBadge .. "\"")
+            end 
         else
             for i, func in ipairs(receiveBadges) do
                 func(message)
@@ -105,11 +104,13 @@ if Client then
     
     local function OnLoadComplete()
         local sSavedBadge = Client.GetOptionString("Badge", "")
-        if sBadgeExists(sSavedBadge) and Client.GetIsConnected() then
-            Client.SendNetworkMessage("Badge", { badge = kBadges[sSavedBadge] }, true)
-        else 
-            Client.SetOptionString("Badge", "") 
-        end
+        if Client.GetIsConnected() then
+            if sBadgeExists(sSavedBadge) then
+                Client.SendNetworkMessage("Badge", { badge = kBadges[sSavedBadge] }, true)
+            else
+                Client.SetOptionString("Badge", "")     
+            end
+        end    
     end
     Event.Hook("LoadComplete", OnLoadComplete)
     
@@ -282,15 +283,14 @@ if Server then
     end
 
     local function OnRequestBadge(client, message)
-
         local kBadge = message.badge
-        if client ~= nil and kBadge ~= nil then
-            local function RequestCallback(sClientBadges)
-                local authorized = table.contains(sClientBadges, kBadges[kBadge])
-                if authorized then
-                    setClientBadgeEnum(client, kBadge)
-                else
-                    if #sClientBadges > 1 then
+        if client and kBadge then
+            local function RequestCallback(sClientBadges)                
+                if #sClientBadges > 0 then
+                    local authorized = table.contains(sClientBadges, kBadges[kBadge]) 
+                    if authorized then
+                        setClientBadgeEnum(client, kBadge)
+                    else                    
                         setClientBadgeEnum(client, kBadges[sClientBadges[1]])
                     end
                 end

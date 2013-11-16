@@ -499,7 +499,7 @@ function GUIMainMenu:CreateProfile()
             function dlcIcon:OnSendKey(key, down)
                 if down then
                     SelectBadge(guimainmenu, dlcIcon.id)
-                    Shared.ConsoleCommand("badge " .. dlcIcon.id)
+                    Shared.ConsoleCommand("badge \"" .. dlcIcon.id .. "\"")
                 end
             end
             table.insert(self.dlcIcons, dlcIcon)
