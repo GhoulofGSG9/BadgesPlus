@@ -91,7 +91,8 @@ if Client then
             local sBadge = kBadges[message.badge]
             table.insert(sServerBadges, sBadge)
             -- default to first badge if we haven't selected one
-            if Client.GetOptionString("Badge", "") == "" then
+            if Client.GetOptionString("Badge", "") == "" or Client.GetOptionString("Badge", "") == sBadge then
+                Client.SetOptionString("Badge", "")
                 Shared.ConsoleCommand("badge \"" .. sBadge .. "\"")
             end 
         else
@@ -284,6 +285,7 @@ if Server then
 
     local function OnRequestBadge(client, message)
         local kBadge = message.badge
+        if kBadge == getClientBadgeEnum(client) then return end
         if client and kBadge then
             local function RequestCallback(sClientBadges)                
                 if #sClientBadges > 0 then
