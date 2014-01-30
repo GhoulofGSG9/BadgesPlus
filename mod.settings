@@ -1,8 +1,0 @@
-name        = "Player Badges"
-source_dir  = ""
-output_dir  = "C:\Program Files (x86)\Steam\steamapps\common\natural selection 2\badges"
-description = [=[Mod Id: 5f42a0c
-Player Badges gives badges to admins, and lets server operators award badges to special players on their servers.
-Check out the [url=http://steamcommunity.com/sharedfiles/filedetails/?id=124034170]Player Badges Assignment Guide[/url] to learn more about how to badges are given to players.]=]
-image       = "bm_preview.jpg"
-publish_id = "5f42a0c"

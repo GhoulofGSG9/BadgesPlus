@@ -239,7 +239,8 @@ if Server then
     end
     
     function setClientBadgeEnum(client, kBadge)
-        local id = client:GetId()
+        local id = client.GetId and client:GetId()
+        if not id then return end
         kPlayerBadges[id] = kBadge
         local player = client:GetControllingPlayer()
         player.currentBadge = kBadge
@@ -247,6 +248,7 @@ if Server then
     end
 
     function getClientBadgeEnum(client)
+        if not client then return end
         local kPlayerBadge = kPlayerBadges[client:GetId()]
         if kPlayerBadge then
             return kPlayerBadge
@@ -255,15 +257,18 @@ if Server then
         end
     end
     
-    local function getServerBadgeStrings(sClientBadges, client)
-        local sServerDefinedBadges = sServerBadges[client:GetUserId()]
+    local function getServerBadgeStrings(sClientBadges, steamid)
+        local sServerDefinedBadges = sServerBadges[steamid]
         if sServerDefinedBadges then
             table.addtable(sServerDefinedBadges, sClientBadges)
         end
     end
     
     function GetBadgeStrings(client, callback)
-        local url = kBadgeServerUrl..queryAddress..tostring(client:GetUserId())
+        local steamid = client.GetUserId and client:GetUserId() or 0
+        if steamid <= 0 then return end
+        
+        local url = kBadgeServerUrl..queryAddress..tostring(steamid)
         
         Shared.SendHTTPRequest(url, "GET",
         function(response)
@@ -272,7 +277,7 @@ if Server then
             if sClientBadges == nil then
                 sClientBadges = {}
             end
-            getServerBadgeStrings(sClientBadges, client)
+            getServerBadgeStrings(sClientBadges, steamid)
             callback(sClientBadges)
         end)
     end
@@ -288,7 +293,7 @@ if Server then
         if kBadge == getClientBadgeEnum(client) then return end
         if client and kBadge then
             local function RequestCallback(sClientBadges)                
-                if #sClientBadges > 0 then
+                if #sClientBadges > 0 and client.GetId then
                     local authorized = table.contains(sClientBadges, kBadges[kBadge]) 
                     if authorized then
                         setClientBadgeEnum(client, kBadge)
@@ -303,9 +308,7 @@ if Server then
     Server.HookNetworkMessage("Badge", OnRequestBadge)
     
     local function OnClientConnect(client)
-
-        foreachBadge(BroadcastBadge)
-        
+        foreachBadge(BroadcastBadge)        
         local function RequestCallback(sClientBadges)
             table.removeTable(kReservedBadges, sClientBadges)
             for i, sClientBadge in ipairs(sClientBadges) do
