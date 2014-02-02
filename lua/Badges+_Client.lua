@@ -1,3 +1,5 @@
+Script.Load("lua/menu/GUIMainMenu.lua") --262 fix
+
 local function SelectBadge(self, id)    
     for i = 1, #self.dlcIcons do
         local dlcIcon = self.dlcIcons[i]
