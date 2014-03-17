@@ -29,16 +29,15 @@ local function OnClientConnect(client)
                 
                     local obj, pos, err = json.decode(response, 1, nil)
                     
-                    if err ~= nil then
+                    if err then
                     
                         Print("Error from hive get-badges response: " .. ToString(err))
-                        return
                         
                     end
                     
                     // Build reverse table.
                     local badge2has = { }
-                    if obj.badges ~= nil then
+                    if obj and obj.badges then
                     
                         for i,name in ipairs(obj.badges) do
                             badge2has[name] = true
