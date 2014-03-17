@@ -7,8 +7,7 @@ Client.HookNetworkMessage("ClientBadges",
             //Print("received ClientBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
             ClientId2Badges[ msg.clientId ] = msg 
         end)
-
--- Badge mod
+ 
 local clientIdToBadge = {}
 local function OnReceiveBadge(message)
     clientIdToBadge[message.clientIndex] = "ui/badges/" .. kBadges[message.badge] .. ".dds"
@@ -18,13 +17,13 @@ addReceiveBadgeHook(OnReceiveBadge)
 function Badges_GetBadgeTextures( clientId, usecase )
 
     local badges = ClientId2Badges[ clientId ]
+    local badgeModTexture = clientIdToBadge[clientId]
 
-    if badges then
+    if badges or badgeModTexture then
 
         local textures = {}
         local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
-
-        local badgeModTexture = clientIdToBadge[clientId]
+        
         if badgeModTexture then
             table.insert(textures, badgeModTexture)
         end

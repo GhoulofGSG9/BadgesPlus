@@ -72,7 +72,7 @@ if Client then
         function(response)
             
             local sClientBadges = json.decode(response)
-            if sClientBadges == nil then
+            if not sClientBadges then
                 sClientBadges = {}
             end
             getServerBadgeStrings(sClientBadges)
@@ -219,8 +219,7 @@ if Server then
                         
                         -- Assign all badges for the group
                         for i, sGroupBadge in ipairs(sGroupBadges) do
-                            local sGroupBadgeLower = sGroupBadge
-                            if not GiveBadge(userId, sGroupBadgeLower) then
+                            if not GiveBadge(userId, sGroupBadge) then
                                 Print(groupName .. " is configured for a badge that non-existent or reserved badge: " .. sGroupBadge)
                             end
                         end
@@ -265,7 +264,7 @@ if Server then
     
     function GetBadgeStrings(client, callback)
         local steamid = client.GetUserId and client:GetUserId() or 0
-        if steamid <= 0 then return end
+        if steamid < 1 then return end
         
         local url = kBadgeServerUrl..queryAddress..tostring(steamid)
         
@@ -273,7 +272,7 @@ if Server then
         function(response)
             
             local sClientBadges = json.decode(response)
-            if sClientBadges == nil then
+            if not sClientBadges then
                 sClientBadges = {}
             end
             getServerBadgeStrings(sClientBadges, steamid)
