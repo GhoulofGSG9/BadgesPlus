@@ -17,27 +17,22 @@ addReceiveBadgeHook(OnReceiveBadge)
 function Badges_GetBadgeTextures( clientId, usecase )
 
     local badges = ClientId2Badges[ clientId ]
-    local badgeModTexture = clientIdToBadge[clientId]
-
-    if badges or badgeModTexture then
-
-        local textures = {}
-        local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
+    local badgeModTexture = clientIdToBadge[ clientId ]
+    
+    local textures = {}
+    local textureKey = ( usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture" )
         
-        if badgeModTexture then
-            table.insert(textures, badgeModTexture)
-        end
-        
-        for _,info in ipairs(gBadgesData) do
-            if badges[ Badge2NetworkVarName(info.name) ] == true then
-                table.insert( textures, info[textureKey] )
+    if badgeModTexture then
+        table.insert( textures, badgeModTexture )
+    end
+    
+    if badges then
+        for _,info in ipairs( gBadgesData ) do
+            if badges[ Badge2NetworkVarName( info.name ) ] == true then
+                table.insert( textures, info[ textureKey ] )
             end
         end
-
-        return textures
-
-    else
-        return {}
     end
-
+    
+    return textures
 end

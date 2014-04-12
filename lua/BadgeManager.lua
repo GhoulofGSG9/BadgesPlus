@@ -1,11 +1,10 @@
 Script.Load("lua/Badges_Shared.lua")
-local kBadgeServerUrl = "http://ns2c.herokuapp.com/"
 
 -- Load all badge images. Custom badges will be loaded through here
 do
 
-    local function isOfficial(badgeFile)
-        for i,info in ipairs(gBadgesData) do
+    local function isOfficial( badgeFile )
+        for i,info in ipairs( gBadgesData ) do
             if info.unitStatusTexture == badgeFile then
                 return true
             end
@@ -15,24 +14,21 @@ do
     
     local sBadges = { 'None' }
     local badgeFiles = { }
-    Shared.GetMatchingFileNames("ui/badges/*.dds", false, badgeFiles)
+    Shared.GetMatchingFileNames( "ui/badges/*.dds", false, badgeFiles )
 
     -- Texture for all badges is "ui/${name}.dds"
-    for _, badgeFile in pairs(badgeFiles) do
+    for _, badgeFile in pairs( badgeFiles ) do
         
         -- exclude official and _20.dds small versions of badges
-        if not isOfficial(badgeFile) and not StringEndsWith(badgeFile, "_20.dds") then
+        if not isOfficial( badgeFile ) and not StringEndsWith( badgeFile, "_20.dds" ) then
             local _, _, sBadgeName = string.find(badgeFile, "ui/badges/(.*).dds")
-            table.insert(sBadges, sBadgeName)
+            table.insert( sBadges, sBadgeName )
         end
         
     end
     
     kBadges = enum( sBadges )
 end
-
--- reserved badges (can not be assigned by server)
-local kReservedBadges = { kBadges.huze, kBadges.ensl_admin, kBadges.ensl_staff }
 
 local kBadgeMessage = 
 {
@@ -53,31 +49,13 @@ local function sBadgeExists(sBadge)
     return table.contains(kBadges, sBadge)
 end
 
-local function sBadgeReserved(sBadge)
-    return table.contains(kReservedBadges, kBadges[sBadge])
-end
-
-
-
 if Client then
 
     local sServerBadges = {}
-    local function getServerBadgeStrings(sClientBadges)
-        table.adduniquetable(sServerBadges, sClientBadges)
-    end
-
-    function GetBadgeStrings(callback)
-
-        Shared.SendHTTPRequest(kBadgeServerUrl.."q/badges/"..tostring(Client.GetSteamId()), "GET",
-        function(response)
-            
-            local sClientBadges = json.decode(response)
-            if not sClientBadges then
-                sClientBadges = {}
-            end
-            getServerBadgeStrings(sClientBadges)
-            callback(sClientBadges)
-        end)
+	
+	function GetBadgeStrings( callback )        
+        local sClientBadges = sServerBadges
+        callback( sClientBadges )        
     end
     
     local receiveBadges = {}
@@ -100,58 +78,58 @@ if Client then
             end
         end
     end
-    Client.HookNetworkMessage("Badge", OnReceiveBadge)
+    Client.HookNetworkMessage( "Badge", OnReceiveBadge )
     
     local function OnLoadComplete()
-        local sSavedBadge = Client.GetOptionString("Badge", "")
+        local sSavedBadge = Client.GetOptionString( "Badge", "" )
         if Client.GetIsConnected() then
-            if sBadgeExists(sSavedBadge) then
-                Client.SendNetworkMessage("Badge", { badge = kBadges[sSavedBadge] }, true)
+            if sBadgeExists( sSavedBadge ) then
+                Client.SendNetworkMessage( "Badge", { badge = kBadges[ sSavedBadge ] }, true )
             else
-                Client.SetOptionString("Badge", "")     
+                Client.SetOptionString( "Badge", "" )     
             end
         end    
     end
-    Event.Hook("LoadComplete", OnLoadComplete)
+    Event.Hook( "LoadComplete", OnLoadComplete )
     
     local function OnClientDisconnected()
         sServerBadges = {}
     end
-    Event.Hook("ClientDisconnected", OnClientDisconnected)
+    Event.Hook( "ClientDisconnected", OnClientDisconnected )
     
     local function OnConsoleBadge(sRequestedBadge)
-        local sSavedBadge = Client.GetOptionString("Badge", "")
+        local sSavedBadge = Client.GetOptionString( "Badge", "" )
         if sRequestedBadge == nil or StringTrim(sRequestedBadge) == "" then
-            Print("Saved Badge: " .. sSavedBadge)
+            Print( "Saved Badge: " .. sSavedBadge )
         elseif sRequestedBadge == "-" then
-            Client.SetOptionString("Badge", "")
+            Client.SetOptionString( "Badge", "" )
         elseif sRequestedBadge ~= sSavedBadge then
-            Client.SetOptionString("Badge", sRequestedBadge)
+            Client.SetOptionString( "Badge", sRequestedBadge )
             if sBadgeExists(sRequestedBadge) and Client.GetIsConnected() then
-                Client.SendNetworkMessage("Badge", { badge = kBadges[sRequestedBadge] }, true)
+                Client.SendNetworkMessage( "Badge", { badge = kBadges[sRequestedBadge] }, true)
             end
         end
     end
-    Event.Hook("Console_badge", OnConsoleBadge)
+    Event.Hook( "Console_badge", OnConsoleBadge )
     
     local function OnConsoleAllBadges()
-        Print("--All Badges--")
-        for _,sBadge in ipairs(kBadges) do
-            Print(ToString(sBadge))
+        Print( "--All Badges--" )
+        for _,sBadge in ipairs( kBadges ) do
+            Print( ToString( sBadge ) )
         end
     end
-    Event.Hook("Console_allbadges", OnConsoleAllBadges)
+    Event.Hook( "Console_allbadges", OnConsoleAllBadges )
 
     local function OnConsoleBadges()
         local function RequestCallback(sClientBadges)
-            Print("--Available Badges--")
-            for _,sBadge in ipairs(sClientBadges) do
-                Print(sBadge)
+            Print( "--Available Badges--" )
+            for _,sBadge in ipairs( sClientBadges ) do
+                Print( sBadge )
             end
         end
-        GetBadgeStrings(RequestCallback)
+        GetBadgeStrings( RequestCallback )
     end
-    Event.Hook("Console_badges", OnConsoleBadges)
+    Event.Hook( "Console_badges", OnConsoleBadges )
 
 end
 
@@ -163,25 +141,24 @@ if Server then
     -- Badges defined by the server operator or other mods
     local sServerBadges = {}
     
-    function GiveBadge(userId, sBadgeName)
-        local sClientBadges = sServerBadges[userId]
+    function GiveBadge( userId, sBadgeName )
+        local sClientBadges = sServerBadges[ userId ]
         if not sClientBadges then
             sClientBadges = {}
-            sServerBadges[userId] = sClientBadges
+            sServerBadges[ userId ] = sClientBadges
         end
-        if sBadgeExists(sBadgeName) and not sBadgeReserved(sBadgeName) then
-            table.insertunique(sClientBadges, sBadgeName)
+        if sBadgeExists( sBadgeName ) then
+            table.insertunique( sClientBadges, sBadgeName )
             return true
         end
         return false
     end
     
     -- Parse the server admin file
-    local queryAddress = "q/badges/"
     do
         local function LoadConfigFile(fileName)
-            Shared.Message("Loading Badge " .. "config://" .. fileName)
-            local openedFile = io.open("config://" .. fileName, "r")
+            Shared.Message( "Loading Badge " .. "config://" .. fileName )
+            local openedFile = io.open( "config://" .. fileName, "r" )
             if openedFile then
             
                 local parsedFile = openedFile:read("*all")
@@ -192,18 +169,11 @@ if Server then
             return nil
         end
         
-        local function ParseJSONStruct(struct)
-            return json.decode(struct) or {}
-        end
-
-        local SUID = LoadConfigFile("ServerUID.txt")
-        if SUID then
-            assert(SUID:len() == 32)
-            queryAddress = "s/badges/" .. SUID .. "/"
-            Print("Remote Config Server UUID: " .. SUID)
+        local function ParseJSONStruct( struct )
+            return json.decode( struct ) or {}
         end
     
-        local serverAdmin = ParseJSONStruct(LoadConfigFile("ServerAdmin.json"))
+        local serverAdmin = ParseJSONStruct( LoadConfigFile("ServerAdmin.json") )
         if serverAdmin.users then
             for _, user in pairs(serverAdmin.users) do
                 local userId = user.id
@@ -218,9 +188,9 @@ if Server then
                         end
                         
                         -- Assign all badges for the group
-                        for i, sGroupBadge in ipairs(sGroupBadges) do
-                            if not GiveBadge(userId, sGroupBadge) then
-                                Print(groupName .. " is configured for a badge that non-existent or reserved badge: " .. sGroupBadge)
+                        for i, sGroupBadge in ipairs( sGroupBadges ) do
+                            if not GiveBadge( userId, sGroupBadge ) then
+                                Print( groupName .. " is configured for a badge that non-existent or reserved badge: " .. sGroupBadge )
                             end
                         end
                     end
@@ -232,22 +202,22 @@ if Server then
         end
     end
     
-    local function BroadcastBadge(id, kBadge)
-        Server.SendNetworkMessage("Badge", BuildBadgeMessage(id, kBadge), true)
+    local function BroadcastBadge( id, kBadge )
+        Server.SendNetworkMessage( "Badge", BuildBadgeMessage( id, kBadge ), true)
     end
     
-    function setClientBadgeEnum(client, kBadge)
+    function setClientBadgeEnum( client, kBadge )
         local id = client.GetId and client:GetId()
         if not id then return end
-        kPlayerBadges[id] = kBadge
+        kPlayerBadges[ id ] = kBadge
         local player = client:GetControllingPlayer()
         player.currentBadge = kBadge
-        BroadcastBadge(id, kBadge)
+        BroadcastBadge( id, kBadge )
     end
 
-    function getClientBadgeEnum(client)
+    function getClientBadgeEnum( client )
         if not client then return end
-        local kPlayerBadge = kPlayerBadges[client:GetId()]
+        local kPlayerBadge = kPlayerBadges[ client:GetId() ]
         if kPlayerBadge then
             return kPlayerBadge
         else
@@ -255,70 +225,52 @@ if Server then
         end
     end
     
-    local function getServerBadgeStrings(sClientBadges, steamid)
-        local sServerDefinedBadges = sServerBadges[steamid]
-        if sServerDefinedBadges then
-            table.addtable(sServerDefinedBadges, sClientBadges)
-        end
-    end
-    
-    function GetBadgeStrings(client, callback)
-        local steamid = client.GetUserId and client:GetUserId() or 0
+    local function GetBadgeStrings( client, callback )
+		local steamid = client.GetUserId and client:GetUserId() or 0
         if steamid < 1 then return end
         
-        local url = kBadgeServerUrl..queryAddress..tostring(steamid)
-        
-        Shared.SendHTTPRequest(url, "GET",
-        function(response)
-            
-            local sClientBadges = json.decode(response)
-            if not sClientBadges then
-                sClientBadges = {}
-            end
-            getServerBadgeStrings(sClientBadges, steamid)
-            callback(sClientBadges)
-        end)
+        local sClientBadges = sServerBadges[ steamid ] or {}
+        callback( sClientBadges )        
     end
     
-    function foreachBadge(f)
-        for id,kPlayerBadge in pairs(kPlayerBadges) do
-            f(id, kPlayerBadge)
+    function foreachBadge( f )
+        for id,kPlayerBadge in pairs( kPlayerBadges ) do
+            f( id, kPlayerBadge )
         end
     end
 
-    local function OnRequestBadge(client, message)
+    local function OnRequestBadge( client, message )
         local kBadge = message.badge
-        if kBadge == getClientBadgeEnum(client) then return end
+        if kBadge == getClientBadgeEnum( client ) then return end
         if client and kBadge then
-            local function RequestCallback(sClientBadges)                
+            local function RequestCallback( sClientBadges )                
                 if #sClientBadges > 0 and client.GetId then
-                    local authorized = table.contains(sClientBadges, kBadges[kBadge]) 
+                    local authorized = table.contains( sClientBadges, kBadges[ kBadge ] ) 
                     if authorized then
-                        setClientBadgeEnum(client, kBadge)
+                        setClientBadgeEnum( client, kBadge )
                     else                    
-                        setClientBadgeEnum(client, kBadges[sClientBadges[1]])
+                        setClientBadgeEnum( client, kBadges[ sClientBadges[ 1 ] ] )
                     end
                 end
             end
-            GetBadgeStrings(client, RequestCallback)
+            GetBadgeStrings( client, RequestCallback )
         end
     end
-    Server.HookNetworkMessage("Badge", OnRequestBadge)
+    Server.HookNetworkMessage( "Badge", OnRequestBadge )
     
-    local function OnClientConnect(client)
-        foreachBadge(BroadcastBadge)        
-        local function RequestCallback(sClientBadges)
-            table.removeTable(kReservedBadges, sClientBadges)
-            for i, sClientBadge in ipairs(sClientBadges) do
-                Server.SendNetworkMessage(client, "Badge", BuildBadgeMessage(-1, kBadges[sClientBadge]), true)
+    local function OnClientConnect( client )
+        foreachBadge( BroadcastBadge )        
+        local function RequestCallback( sClientBadges )
+            for i, sClientBadge in ipairs( sClientBadges ) do
+                Server.SendNetworkMessage( client, "Badge", BuildBadgeMessage( -1, kBadges[ sClientBadge ] ), true)
             end
         end
-        GetBadgeStrings(client, RequestCallback)
+        GetBadgeStrings( client, RequestCallback )
     end
-    Event.Hook("ClientConnect", OnClientConnect)
+    Event.Hook( "ClientConnect", OnClientConnect )
     
-    local function OnClientDisconnect(client) 
-        kPlayerBadges[client:GetId()] = nil
+    local function OnClientDisconnect( client ) 
+        kPlayerBadges[ client:GetId() ] = nil
     end
-    Event.Hook("ClientDisconnect", OnClientDisconnect)
+    Event.Hook( "ClientDisconnect", OnClientDisconnect )
 end
