@@ -1,5 +1,5 @@
 -- temp cache of often used function
-local TableInsert = table.insert
+local TableInsert = table.insertunique
 local TableContains = table.contains
 
 local StringFind = string.find
@@ -38,14 +38,14 @@ local kBadgeMessage =
 {
     clientIndex = "entityid",
     badge = "enum kBadges",
-    badgerow = "integer (0 to 10)"
+    badgerow = "integer (1 to 10)"
 }
 
 function BuildBadgeMessage(clientIndex, badge, badgerow )
     local t = {}
     t.clientIndex = clientIndex
     t.badge = badge
-    t.badgerow	= badgerow or 3	
+    t.badgerow	= badgerow
     return t
 end
 
