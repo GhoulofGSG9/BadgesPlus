@@ -36,8 +36,6 @@ function(self)
 		self.totalRows = GetTotalRows( badges )
 		self.badgeRow = self.totalRows
 		
-		Print( tostring( self.badgeRow ))
-		
 		if self.totalRows > 1 then 
             --next button
             self.switchbadgerow = CreateMenuElement( self.profileBackground, "Image" )
