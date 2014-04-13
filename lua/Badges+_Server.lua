@@ -62,8 +62,10 @@ end
 
 function foreachBadge( f )
 	for id, kPlayerRowBadges in pairs( kPlayerBadges ) do
-		for row, kPlayerBadge in ipairs( kPlayerRowBadges ) do
-			f( id, kPlayerBadge, row )
+		for row, kPlayerBadge in pairs( kPlayerRowBadges ) do
+			if kPlayerBadge then
+				f( id, kPlayerBadge, row )
+			end
 		end
 	end
 end
