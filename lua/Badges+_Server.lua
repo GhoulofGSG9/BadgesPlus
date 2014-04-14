@@ -19,6 +19,7 @@ function GiveBadge( userId, sBadgeName, row )
 	if sBadgeExists( sBadgeName ) then
 		TableInsert( sClientBadges, sBadgeName )
 		sServerBadges[ userId ][ row ] = sClientBadges
+		
 		return true
 	end
 	return false
@@ -105,7 +106,7 @@ local function OnClientConnect( client )
 end
 Event.Hook( "ClientConnect", OnClientConnect )
 
-local function OnClientDisconnect( client ) 
+local function OnClientDisconnect( client )
 	kPlayerBadges[ client:GetId() ] = nil
 end
 Event.Hook( "ClientDisconnect", OnClientDisconnect )
