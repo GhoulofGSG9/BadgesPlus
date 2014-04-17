@@ -2,7 +2,7 @@ Script.Load( "lua/Badges+_Shared.lua" )
 
 -- temp cache of often used function
 local StringFormat = string.format
-local TableInsert = table.insert
+local TableInsert = table.insertunique
 local TableContains = table.contains
 
 --Badges+ functions
@@ -30,8 +30,9 @@ local function OnReceiveBadge( message )
 		if not sServerBadges[ row ] then sServerBadges[ row ] = {} end
 		TableInsert( sServerBadges[ row ], sBadge )
 		
+		local SavedBadge = Client.GetOptionString( StringFormat("Badge%s", row ), "" )
 		-- default to first badge if we haven't selected one
-		if Client.GetOptionString( StringFormat("Badge%s", row ), "" ) == "" or StringFormat("Badge%s", row ) == sBadge then
+		if SavedBadge == "" or SavedBadge == sBadge then
 			Client.SetOptionString( StringFormat("Badge%s", row), "" )
 			Shared.ConsoleCommand( StringFormat( "badge \"%s\" %s", sBadge, row ))
 		end 
