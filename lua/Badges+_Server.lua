@@ -10,7 +10,11 @@ local kPlayerBadges = {}
 local sServerBadges = {}
 
 function GiveBadge( userId, sBadgeName, row )
-	if not row or row < 1 or row > 10 then row = 3 end	
+	if not ( userId or sBadgeName ) then return false end
+  
+	if row then row = tonumber( row ) end
+	if not row or row < 1 or row > 10 then row = 3 end
+	
 	if not sServerBadges[ userId ] then sServerBadges[ userId ] = {} end
 	
 	local sClientBadges = sServerBadges[ userId ][ row ]
@@ -19,6 +23,7 @@ function GiveBadge( userId, sBadgeName, row )
 	if sBadgeExists( sBadgeName ) then
 		TableInsert( sClientBadges, sBadgeName )
 		sServerBadges[ userId ][ row ] = sClientBadges
+		
 		return true
 	end
 	return false
@@ -62,8 +67,10 @@ end
 
 function foreachBadge( f )
 	for id, kPlayerRowBadges in pairs( kPlayerBadges ) do
-		for row, kPlayerBadge in ipairs( kPlayerRowBadges ) do
-			f( id, kPlayerBadge, row )
+		for row, kPlayerBadge in pairs( kPlayerRowBadges ) do
+			if kPlayerBadge then
+				f( id, kPlayerBadge, row )
+			end
 		end
 	end
 end
@@ -103,7 +110,7 @@ local function OnClientConnect( client )
 end
 Event.Hook( "ClientConnect", OnClientConnect )
 
-local function OnClientDisconnect( client ) 
+local function OnClientDisconnect( client )
 	kPlayerBadges[ client:GetId() ] = nil
 end
 Event.Hook( "ClientDisconnect", OnClientDisconnect )

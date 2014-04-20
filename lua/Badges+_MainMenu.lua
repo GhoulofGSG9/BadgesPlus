@@ -133,7 +133,7 @@ function(self)
 		}		
 		self.nextbadge:AddEventCallbacks(eventnextbadge)
 		
-		if #self.dlcIcons[ self.badgeRow ] <= 6 then self.nextbadge:SetIsVisible(false) end
+		if not self.dlcIcons[ self.badgeRow ] or #self.dlcIcons[ self.badgeRow ] <= 6 then self.nextbadge:SetIsVisible(false) end
     end
     
     GetBadgeStrings(callback)

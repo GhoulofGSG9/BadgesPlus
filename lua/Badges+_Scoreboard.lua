@@ -3,7 +3,12 @@
 local clientIdToBadge = {}
 local function OnReceiveBadge( message )	
 	if not clientIdToBadge[ message.clientIndex ] then clientIdToBadge[ message.clientIndex ] = {} end
-    clientIdToBadge[ message.clientIndex ][ message.badgerow ] = "ui/badges/" .. kBadges[ message.badge ] .. ".dds"
+	local badge = kBadges[ message.badge ]
+	if badge ~= "disabled" then
+		clientIdToBadge[ message.clientIndex ][ message.badgerow ] = "ui/badges/" .. badge .. ".dds"
+	else
+		clientIdToBadge[ message.clientIndex ][ message.badgerow ] = nil
+	end
 end
 addReceiveBadgeHook( OnReceiveBadge )
 
