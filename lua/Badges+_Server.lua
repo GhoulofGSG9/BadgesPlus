@@ -8,12 +8,20 @@ local TableContains = table.contains
 local kPlayerBadges = {}
 -- Badges defined by the server operator or other mods
 local sServerBadges = {}
+-- ClientTable
+local Users = {}
+
+function AvoidEmptyBadge( Client, Badge, Row )
+    if getClientBadgeEnum( Client, Row ) == kBadges.None then
+       setClientBadgeEnum( Client, kBadges[ Badge ], Row ) 
+    end
+end
 
 function GiveBadge( userId, sBadgeName, row )
 	if not ( userId or sBadgeName ) then return false end
   
 	if row then row = tonumber( row ) end
-	if not row or row < 1 or row > 10 then row = 3 end
+	if not row or row < 1 or row > 10 then row = 5 end
 	
 	if not sServerBadges[ userId ] then sServerBadges[ userId ] = {} end
 	
@@ -23,6 +31,12 @@ function GiveBadge( userId, sBadgeName, row )
 	if sBadgeExists( sBadgeName ) then
 		TableInsert( sClientBadges, sBadgeName )
 		sServerBadges[ userId ][ row ] = sClientBadges
+		
+		local client = Users[ userId ]
+		if client then
+			Server.SendNetworkMessage( client, "Badge", BuildBadgeMessage( -1, kBadges[ sBadgeName ], row ), true )
+			AvoidEmptyBadge( client, sBadgeName, row )
+		end
 		
 		return true
 	end
@@ -35,7 +49,7 @@ end
 
 function setClientBadgeEnum( client, kBadge, row )
 	local id = client:GetId()	
-	if not row or row < 1 or row > 10 then row = 3 end
+	if not row or row < 1 or row > 10 then row = 5 end
 	
 	if not kPlayerBadges[ id ] then kPlayerBadges[ id ] = {} end
 	kPlayerBadges[ id ][ row ] = kBadge
@@ -45,7 +59,7 @@ end
 
 function getClientBadgeEnum( client, row )
 	if not client then return end
-	if not row or row < 1 or row > 10 then row = 3 end	
+	if not row or row < 1 or row > 10 then row = 5 end	
 	local id = client:GetId()
 	
 	local kPlayerBadge = kPlayerBadges[ id ] and kPlayerBadges[ id ][ row ]
@@ -60,6 +74,8 @@ local function GetBadgeStrings( client, callback, row )
 	local steamid = client.GetUserId and client:GetUserId() or 0
 	if steamid < 1 then return end
 	
+	Users[ steamid ] = client
+	
 	local sClientBadges = sServerBadges[ steamid ] or {}
 	
 	callback( sClientBadges )
@@ -68,16 +84,14 @@ end
 function foreachBadge( f )
 	for id, kPlayerRowBadges in pairs( kPlayerBadges ) do
 		for row, kPlayerBadge in pairs( kPlayerRowBadges ) do
-			if kPlayerBadge then
-				f( id, kPlayerBadge, row )
-			end
+			f( id, kPlayerBadge, row )
 		end
 	end
 end
 
 local function OnRequestBadge( client, message )
 	local kBadge = message.badge
-	local row = message.badgerow or 3
+	local row = message.badgerow or 5
 	
 	if kBadge == getClientBadgeEnum( client, row ) then return end
 	if client and kBadge then
@@ -112,6 +126,7 @@ Event.Hook( "ClientConnect", OnClientConnect )
 
 local function OnClientDisconnect( client )
 	kPlayerBadges[ client:GetId() ] = nil
+	if client.GetUserId then Users[ client:GetUserId() ] = nil end
 end
 Event.Hook( "ClientDisconnect", OnClientDisconnect )
 
