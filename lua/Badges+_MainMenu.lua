@@ -1,5 +1,3 @@
-Script.Load("lua/menu/GUIMainMenu.lua") --262 fix
-
 local function SelectBadge(self, id, row)    
     for i = 1, #self.dlcIcons[row] do
         local dlcIcon = self.dlcIcons[row][i]
@@ -13,16 +11,24 @@ end
 
 local function GetTotalRows( badges )
 	local i = 0
-	for t, _ in pairs( badges ) do
-		i = t
+	for _, _ in pairs( badges ) do
+		i = i + 1
+	end
+	return i
+end
+
+local function GetHighestRow( badges )
+	local i = 0
+	for j, _ in pairs( badges ) do
+		i = j
 	end
 	return i
 end
 
 originalMenuCreateProfile = Class_ReplaceMethod( "GUIMainMenu", "CreateProfile",
-function(self)
+function( self )
     --first call original method
-    originalMenuCreateProfile(self)
+    originalMenuCreateProfile( self )
     
     --now let's do badges+ stuff
     LoadCSSFile("lua/menu/main_menu_badges.css")
@@ -34,7 +40,8 @@ function(self)
     --create selectable badges - this only fits 8 buttons, profileBackground must be expanded for more to work
     local function callback( badges )
 		self.totalRows = GetTotalRows( badges )
-		self.badgeRow = self.totalRows
+		self.badgeRow = GetHighestRow( badges )
+		local addrow = self.totalRows > 1 and 1 or 0
 		
 		if self.totalRows > 1 then 
             --next button
@@ -54,7 +61,7 @@ function(self)
                     
                     for row, rowbadges in pairs( self.dlcIcons ) do
 						if row == self.badgeRow then
-							if #rowbadges > 6 then
+							if #rowbadges > ( 7 - addrow ) then
 								self.nextbadge:SetIsVisible( true )
 							else
 								self.nextbadge:SetIsVisible( false )
@@ -62,7 +69,7 @@ function(self)
 						end
 						
 						for i, dlcIcon in ipairs( rowbadges ) do
-							if row ~= self.badgeRow or i <= self.badgePos or i > self.badgePos + 6  then
+							if row ~= self.badgeRow or i <= self.badgePos or i > self.badgePos + ( 7 - addrow )  then
 								dlcIcon:SetIsVisible( false )
 							else
 								dlcIcon:SetIsVisible( true )
@@ -84,10 +91,10 @@ function(self)
 				local dlcIcon = CreateMenuElement(self.profileBackground, "Image")
 				dlcIcon.id = dlc
 				dlcIcon:SetCSSClass( "badge" )
-				dlcIcon:SetLeftOffset( 156 + ( i - 1 ) % 6 * 36 )
+				dlcIcon:SetLeftOffset( 120 + addrow * 36 + ( i - 1 ) % ( 7 - addrow ) * 36 )
 				dlcIcon:EnableHighlighting()
 				dlcIcon:SetBackgroundTexture( "ui/badges/".. dlc .. ".dds" )
-				if row ~= self.badgeRow or i <= self.badgePos or i > self.badgePos + 6  then
+				if row ~= self.badgeRow or i <= self.badgePos or i > self.badgePos + ( 7 - addrow )  then
 					dlcIcon:SetIsVisible( false )
 				end
 				
@@ -113,13 +120,13 @@ function(self)
 		local eventnextbadge =
 		{
 			OnClick = function(key, down)
-				self.badgePos = self.badgePos + 6
+				self.badgePos = self.badgePos + ( 7 - addrow )
 				local dlcIcons = self.dlcIcons[ self.badgeRow ]
 				if self.badgePos > #dlcIcons  then
 					self.badgePos = 0
 				end
 				for i, dlcIcon in ipairs( dlcIcons ) do
-					if i <= self.badgePos or i > self.badgePos + 6  then
+					if i <= self.badgePos or i > self.badgePos + ( 7 - addrow )  then
 						dlcIcon:SetIsVisible(false)
 					else
 						dlcIcon:SetIsVisible(true)
@@ -133,7 +140,7 @@ function(self)
 		}		
 		self.nextbadge:AddEventCallbacks(eventnextbadge)
 		
-		if not self.dlcIcons[ self.badgeRow ] or #self.dlcIcons[ self.badgeRow ] <= 6 then self.nextbadge:SetIsVisible(false) end
+		if not self.dlcIcons[ self.badgeRow ] or #self.dlcIcons[ self.badgeRow ] <= ( 7 - addrow ) then self.nextbadge:SetIsVisible(false) end
     end
     
     GetBadgeStrings(callback)
