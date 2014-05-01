@@ -20,8 +20,9 @@ end
 local function GetHighestRow( badges )
 	local i = 0
 	for j, _ in pairs( badges ) do
-		i = j
+		if j > i then i = j end
 	end
+	
 	return i
 end
 
@@ -40,7 +41,8 @@ function( self )
     --create selectable badges - this only fits 8 buttons, profileBackground must be expanded for more to work
     local function callback( badges )
 		self.totalRows = GetTotalRows( badges )
-		self.badgeRow = GetHighestRow( badges )
+		self.highestRow = GetHighestRow( badges )
+		self.badgeRow = self.highestRow
 		local addrow = self.totalRows > 1 and 1 or 0
 		
 		if self.totalRows > 1 then 
@@ -55,7 +57,7 @@ function( self )
                 OnClick = function(key, down)
                     repeat
 						self.badgeRow = self.badgeRow + 1 
-						if self.badgeRow > self.totalRows then self.badgeRow = 1 end
+						if self.badgeRow > self.highestRow then self.badgeRow = 1 end
                     until self.dlcIcons[ self.badgeRow ] ~= nil and #self.dlcIcons[ self.badgeRow ] > 0
                     self.badgePos = 0
                     
