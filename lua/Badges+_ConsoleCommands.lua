@@ -24,8 +24,10 @@ local function OnConsoleBadge( sRequestedBadge, Row)
 		Print( StringFormat( "Saved Badge: %s", sSavedBadge ))
 	elseif sRequestedBadge == "-" then
 		Client.SetOptionString( StringFormat("Badge%s", Row ), "" )
+		SelectBadge( "None", Row )
 	elseif sRequestedBadge ~= sSavedBadge and GetClientOwnBadge( sRequestedBadge, Row ) then
 		Client.SetOptionString( StringFormat( "Badge%s", Row ), sRequestedBadge )
+		SelectBadge( sRequestedBadge, Row )
 		Client.SendNetworkMessage( "Badge", { badge = kBadges[ sRequestedBadge ], badgerow = Row }, true)
 	elseif sRequestedBadge == sSavedBadge then
 		Print( "You allready have selected the requested badge" )

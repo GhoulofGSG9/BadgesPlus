@@ -1,4 +1,14 @@
-local function SelectBadge(self, id, row)    
+
+local GuiMainMenu
+local CachedSelections = {}
+
+function SelectBadge( id, row )
+	local self = GuiMainMenu
+	if not self then
+		CachedSelections[ row ] = id
+		return 
+	end
+	
     for i = 1, #self.dlcIcons[row] do
         local dlcIcon = self.dlcIcons[row][i]
         if dlcIcon.id == id then
@@ -7,14 +17,6 @@ local function SelectBadge(self, id, row)
             dlcIcon:SetBorderWidth(0)
         end
     end
-end
-
-local function GetTotalRows( badges )
-	local i = 0
-	for _, _ in pairs( badges ) do
-		i = i + 1
-	end
-	return i
 end
 
 local function GetHighestRow( badges )
@@ -35,12 +37,11 @@ function( self )
     LoadCSSFile("lua/menu/main_menu_badges.css")
     
     self.dlcIcons = {}
-    self.badgePos = 0
-    
+    self.badgePos = 0    
     
     --create selectable badges - this only fits 8 buttons, profileBackground must be expanded for more to work
     local function callback( badges )
-		self.totalRows = GetTotalRows( badges )
+		self.totalRows = GetTableSize( badges )
 		self.highestRow = GetHighestRow( badges )
 		self.badgeRow = self.highestRow
 		local addrow = self.totalRows > 1 and 1 or 0
@@ -100,10 +101,9 @@ function( self )
 					dlcIcon:SetIsVisible( false )
 				end
 				
-				local guimainmenu = self
+				
 				function dlcIcon:OnSendKey(key, down)
 					if down then
-						SelectBadge( guimainmenu, dlcIcon.id, row)
 						Shared.ConsoleCommand("badge \"" .. dlcIcon.id .. "\" " .. row )
 					end
 				end
@@ -111,6 +111,11 @@ function( self )
 				if not self.dlcIcons[ row ] then self.dlcIcons[ row ] = {} end
 				table.insert( self.dlcIcons[ row ], dlcIcon)
 			end
+        end
+        
+        GuiMainMenu = self
+        for row, id in pairs( CachedSelections ) do
+			SelectBadge( id, row )
         end
         
 		--next button
