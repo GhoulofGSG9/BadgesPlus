@@ -103,8 +103,8 @@ function( self )
 				
 				
 				function dlcIcon:OnSendKey(key, down)
-					if down then
-						Shared.ConsoleCommand("badge \"" .. dlcIcon.id .. "\" " .. row )
+					if down and self.borderStyle.Width == 0 then 
+							Shared.ConsoleCommand("badge \"" .. dlcIcon.id .. "\" " .. row )
 					end
 				end
 				

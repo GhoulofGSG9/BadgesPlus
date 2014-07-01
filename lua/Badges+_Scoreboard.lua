@@ -1,13 +1,19 @@
 --Badge_Client.lua Hooks
 
 local clientIdToBadge = {}
+local clientIdToBadgeName = {}
+
 local function OnReceiveBadge( message )	
 	if not clientIdToBadge[ message.clientIndex ] then clientIdToBadge[ message.clientIndex ] = {} end
+	if not clientIdToBadgeName[ message.clientIndex ] then clientIdToBadgeName[ message.clientIndex ] = {} end
+	
 	local badge = kBadges[ message.badge ]
 	if badge ~= "disabled" then
 		clientIdToBadge[ message.clientIndex ][ message.badgerow ] = "ui/badges/" .. badge .. ".dds"
+		clientIdToBadgeName[ message.clientIndex ][ message.badgerow ] = badge
 	else
 		clientIdToBadge[ message.clientIndex ][ message.badgerow ] = nil
+		clientIdToBadgeName[ message.clientIndex ][ message.badgerow ] = nil
 	end
 end
 addReceiveBadgeHook( OnReceiveBadge )
@@ -22,16 +28,20 @@ end
 local OldBadges_GetBadgeTextures = Badges_GetBadgeTextures
 function Badges_GetBadgeTextures( clientId, usecase )
 	local textures = {}
-	local badgeModTextures = clientIdToBadge[ clientId ]
+	local texturenames = {}
 	
+	local badgeModTextures = clientIdToBadge[ clientId ]
+	local badgeNames = clientIdToBadge[ clientId ]	
 	if badgeModTextures then
-		for _, badgeModTexture in pairs( badgeModTextures ) do
+		for badgerow, badgeModTexture in pairs( badgeModTextures ) do
 			table.insert( textures, badgeModTexture )
+			table.insert( texturenames, badgeNames[ badgerow ] )
 		end
     end
     
-    local hivetextures = OldBadges_GetBadgeTextures( clientId, usecase )
+    local hivetextures, hivetexturenames = OldBadges_GetBadgeTextures( clientId, usecase )
     textures = joinTwoTables( textures, hivetextures )
+	texturenames = joinTwoTables( texturenames, hivetexturenames )
     
-    return textures
+    return textures, texturenames
 end

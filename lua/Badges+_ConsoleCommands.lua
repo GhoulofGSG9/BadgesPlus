@@ -30,7 +30,7 @@ local function OnConsoleBadge( sRequestedBadge, Row)
 		SelectBadge( sRequestedBadge, Row )
 		Client.SendNetworkMessage( "Badge", { badge = kBadges[ sRequestedBadge ], badgerow = Row }, true)
 	elseif sRequestedBadge == sSavedBadge then
-		Print( "You allready have selected the requested badge" )
+		Print( "You already have selected the requested badge" )
 	else
 		Print( "Either you don't own the requested badge at this server or it doesn't exist." )
 	end
