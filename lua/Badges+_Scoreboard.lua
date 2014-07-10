@@ -41,7 +41,9 @@ function Badges_GetBadgeTextures( clientId, usecase )
     
     local hivetextures, hivetexturenames = OldBadges_GetBadgeTextures( clientId, usecase )
     textures = joinTwoTables( textures, hivetextures )
-	texturenames = joinTwoTables( texturenames, hivetexturenames )
+	if hivetexturenames then 
+		texturenames = joinTwoTables( texturenames, hivetexturenames )
+	end
     
     return textures, texturenames
 end
