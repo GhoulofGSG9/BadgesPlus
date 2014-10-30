@@ -64,5 +64,5 @@ end
 Event.Hook( "ClientDisconnected", OnClientDisconnected )
 
 Script.Load( "lua/Badges+_Scoreboard.lua" )
-Script.Load( "lua/Badges+_MainMenu.lua" )
+--Script.Load( "lua/Badges+_MainMenu.lua" )
 Script.Load( "lua/Badges+_ConsoleCommands.lua" )
