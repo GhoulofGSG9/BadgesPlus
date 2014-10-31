@@ -4,10 +4,12 @@ local StringFormat = string.format
 local function OnConsoleBadges()
 	local function RequestCallback(sClientBadges)
 		Print( "--Available Badges--" )
-		for _, sBadgeRows in pairs( sClientBadges ) do
+		for i, sBadgeRows in pairs( sClientBadges ) do
+			Print( StringFormat( "Badge-Row %s", i ))
 			for _, sBadge in ipairs( sBadgeRows ) do
 				Print( sBadge )
 			end
+			Print( "-------------" )
 		end
 	end
 	GetBadgeStrings( RequestCallback )
