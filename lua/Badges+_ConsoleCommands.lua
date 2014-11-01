@@ -5,7 +5,7 @@ local function OnConsoleBadges()
 	local function RequestCallback(sClientBadges)
 		Print( "--Available Badges--" )
 		for i, sBadgeRows in pairs( sClientBadges ) do
-			Print( StringFormat( "Badge-Row %s", i ))
+			Print( StringFormat( "Badge-Row %s:", i ))
 			for _, sBadge in ipairs( sBadgeRows ) do
 				Print( sBadge )
 			end
