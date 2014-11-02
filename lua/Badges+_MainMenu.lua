@@ -1,4 +1,3 @@
-
 local GuiMainMenu
 local CachedSelections = {}
 
@@ -28,11 +27,25 @@ local function GetHighestRow( badges )
 	return i
 end
 
-originalMenuCreateProfile = Class_ReplaceMethod( "GUIMainMenu", "CreateProfile",
+originalMenuInit = Class_ReplaceMethod( "GUIMainMenu", "Initialize",
+function( self )
+	originalMenuInit( self )
+
+	if MainMenu_IsInGame() then
+		self:CreateStatsBox()
+	end
+end)
+
+originalMenuCreateProfile = Class_ReplaceMethod( "GUIMainMenu", "CreateStatsBox",
 function( self )
     --first call original method
     originalMenuCreateProfile( self )
     
+	--this is blocking all key events ....
+	if self.statProgressBox then
+		self.statProgressBox:SetIsVisible(false) 
+	end
+	
     --now let's do badges+ stuff
     LoadCSSFile("lua/menu/main_menu_badges.css")
     
@@ -48,9 +61,8 @@ function( self )
 		
 		if self.totalRows > 1 then 
             --next button
-            self.switchbadgerow = CreateMenuElement( self.profileBackground, "Image" )
+            self.switchbadgerow = CreateMenuElement( self.statsBox, "Image" )
             self.switchbadgerow:SetCSSClass( "badge" )
-            self.switchbadgerow:SetLeftOffset( 120 )
             self.switchbadgerow:SetBackgroundTexture( "ui/badges/down.dds" )
             
             local eventnextbadgerow =
@@ -91,10 +103,10 @@ function( self )
         
 		for row, rowbadges in pairs( badges ) do
 			for i, dlc in ipairs( rowbadges ) do
-				local dlcIcon = CreateMenuElement(self.profileBackground, "Image")
+				local dlcIcon = CreateMenuElement(self.statsBox, "Image")
 				dlcIcon.id = dlc
 				dlcIcon:SetCSSClass( "badge" )
-				dlcIcon:SetLeftOffset( 120 + addrow * 36 + ( i - 1 ) % ( 7 - addrow ) * 36 )
+				dlcIcon:SetLeftOffset( 150 + addrow * 26 + ( i - 1 ) % ( 7 - addrow ) * 26 )
 				dlcIcon:EnableHighlighting()
 				dlcIcon:SetBackgroundTexture( "ui/badges/".. dlc .. ".dds" )
 				if row ~= self.badgeRow or i <= self.badgePos or i > self.badgePos + ( 7 - addrow )  then
@@ -119,9 +131,9 @@ function( self )
         end
         
 		--next button
-		self.nextbadge = CreateMenuElement(self.profileBackground, "Image")
+		self.nextbadge = CreateMenuElement(self.statsBox, "Image")
 		self.nextbadge:SetCSSClass("badge")
-		self.nextbadge:SetLeftOffset(120 + 7 * 36)
+		self.nextbadge:SetLeftOffset(150 + 7 * 26)
 		self.nextbadge:SetBackgroundTexture("ui/badges/next.dds")
 		
 		local eventnextbadge =
