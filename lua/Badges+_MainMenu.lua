@@ -8,7 +8,9 @@ function SelectBadge( id, row )
 		CachedSelections[ row ] = id
 		return 
 	end
-	
+
+	if not self.dlcIcons[row] then return end
+
     for i = 1, #self.dlcIcons[row] do
         local dlcIcon = self.dlcIcons[row][i]
         if dlcIcon.id == id then
