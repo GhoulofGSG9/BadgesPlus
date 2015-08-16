@@ -34,6 +34,21 @@ do
     kBadges = enum( sBadges )
 end
 
+local kBadgeNameMessage =
+{
+    badge = "enum kBadges",
+    badgename = "string (255)"
+}
+
+function BuildBadgeNameMessage( badge, badgename )
+    local t = {}
+    t.badge = kBadges[badge]
+    t.badgename	= badgename
+    return t
+end
+
+Shared.RegisterNetworkMessage( "BadgeName", kBadgeNameMessage )
+
 local kBadgeMessage = 
 {
     clientIndex = "entityid",

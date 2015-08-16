@@ -31,7 +31,7 @@ function Badges_GetBadgeTextures( clientId, usecase )
 	local texturenames = {}
 	
 	local badgeModTextures = clientIdToBadge[ clientId ]
-	local badgeNames = clientIdToBadge[ clientId ]	
+	local badgeNames = clientIdToBadgeName[ clientId ]
 	if badgeModTextures then
 		for badgerow, badgeModTexture in pairs( badgeModTextures ) do
 			table.insert( textures, badgeModTexture )
@@ -47,3 +47,17 @@ function Badges_GetBadgeTextures( clientId, usecase )
     
     return textures, texturenames
 end
+
+local badgeNameToFormalName = {}
+
+local oldGetBadgeFormalName = GetBadgeFormalName
+function GetBadgeFormalName( name )
+	local formalName = sBadgeExists(name) and badgeNameToFormalName[kBadges[name]]
+	return formalName or oldGetBadgeFormalName( name )
+end
+
+local function OnReceiveBadgeName( message )
+	badgeNameToFormalName[message.badge] = message.badgename
+end
+
+Client.HookNetworkMessage( "BadgeName", OnReceiveBadgeName )

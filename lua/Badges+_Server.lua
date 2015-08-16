@@ -43,8 +43,15 @@ function GiveBadge( userId, sBadgeName, row )
 	return false
 end
 
+local badgeNameToFormalName = {}
+function SetFormalBadgeName( badge, name )
+	if not sBadgeExists( badge ) then return end
+	badgeNameToFormalName[badge] = name
+	Server.SendNetworkMessage( "BadgeName", BuildBadgeNameMessage( badge, name ), true )
+end
+
 local function BroadcastBadge( id, kBadge, row )
-	Server.SendNetworkMessage( "Badge", BuildBadgeMessage( id, kBadge, row ), true)
+	Server.SendNetworkMessage( "Badge", BuildBadgeMessage( id, kBadge, row ), true )
 end
 
 function setClientBadgeEnum( client, kBadge, row )
@@ -121,6 +128,10 @@ local function OnClientConnect( client )
 		end
 	end
 	GetBadgeStrings( client, RequestCallback )
+
+	for badge, badgename in pairs(badgeNameToFormalName) do
+		Server.SendNetworkMessage( client, "BadgeName", BuildBadgeNameMessage( badge, badgename ), true)
+	end
 end
 Event.Hook( "ClientConnect", OnClientConnect )
 
