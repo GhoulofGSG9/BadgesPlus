@@ -1,4 +1,10 @@
-modEntry = [[
-Server: lua/Badges+_Server.lua,
-Priority: 100
-]]
+local Build = Shared.GetBuildNumber()
+if Build <= 310 then
+    modEntry = {
+        Client = lua/Badges+_Client.lua,
+        Server = lua/Badges+_Server.lua,
+        Priority = 100
+    }
+else
+    modEntry = {} --avoid console error
+end
