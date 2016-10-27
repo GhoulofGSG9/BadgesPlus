@@ -1,8 +1,8 @@
 local Build = Shared.GetBuildNumber()
-if Build <= 310 then
+if Build < 311 then
     modEntry = {
-        Client = lua/Badges+_Client.lua,
-        Server = lua/Badges+_Server.lua,
+        Client = "lua/Badges+_Client.lua",
+        Server = "lua/Badges+_Server.lua",
         Priority = 100
     }
 else
