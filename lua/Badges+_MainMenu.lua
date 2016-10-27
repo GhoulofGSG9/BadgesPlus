@@ -34,7 +34,10 @@ originalMenuCreateProfile = Class_ReplaceMethod( "GUIMainMenu", "CreateProfile",
 function( self )
     --first call original method
     originalMenuCreateProfile( self )
-    
+
+    --hide the hive level progression bar
+    self.rankLevelBar:SetIsVisible(false)
+
     --now let's do badges+ stuff
     LoadCSSFile("lua/menu/main_menu_badges.css")
     
