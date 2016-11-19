@@ -195,7 +195,7 @@ local function OnClientConnect(client)
         end
     end
 
-    local ownedbadges = userId2OwnedBadges[client:GetUSerId()]
+    local ownedbadges = userId2OwnedBadges[client:GetUserId()]
     if ownedbadges then
         for badgeid, columns in pairs(ownedbadges) do
             Server.SendNetworkMessage(client, "BadgeRows", BuildBadgeRowsMessage(badgeid, columns), true)
