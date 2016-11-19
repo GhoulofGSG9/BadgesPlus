@@ -7,7 +7,7 @@ if Build < 312 then
     }
 else
     modEntry = {
-        Shared = "lua/BadgesPlus/Badges+_Shared.lua",
-        Priority = 100
+        FileHooks = "lua/BadgesPlus/Badges+_Shared.lua",
+        Priority = 51
     }
 end
