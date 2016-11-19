@@ -97,7 +97,6 @@ function GUIBadgesSelection:LoadBadges()
             local activeBadges = self.activeBadges
             self.avaibleBadges[i].OnMouseDown = function(self)
                 local columns = main:GetBadgeRows(self.columns)
-                Print(self.badgeData.name)
 
                 for i = 1, #columns do
                     activeBadges[columns[i]]:SetBackgroundTexture(self.badgeData.unitStatusTexture) --Todo proper highlight

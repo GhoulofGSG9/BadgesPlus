@@ -24,7 +24,7 @@ function Badges_FetchBadges(clientId, response)
 
     local client = Server.GetClientById(clientId)
     if not client then return end
-    
+
     local userId = client:GetUserId()
 
     for _, badgeid in ipairs(gDLCBadges) do
@@ -97,13 +97,13 @@ function GiveBadge(userId, badgeName, column)
 
     local clientId = userId2ClientId[userId]
     local client = clientId and Server.GetClientById(clientId)
-    
+
     if client then
         local queuedRow = gBadgeClientRequestQueue[clientId] and gBadgeClientRequestQueue[clientId][badgeid]
         if queuedRow then
             Badges_SetBadge(clientId, badgeid, queuedRow)
         end
-    
+
         Server.SendNetworkMessage(client, "BadgeRows", BuildBadgeRowsMessage(badgeid, columns), true)
     end
 
@@ -195,10 +195,17 @@ local function OnClientConnect(client)
         end
     end
 
+    local ownedbadges = userId2OwnedBadges[client:GetUSerId()]
+    if ownedbadges then
+        for badgeid, columns in pairs(ownedbadges) do
+            Server.SendNetworkMessage(client, "BadgeRows", BuildBadgeRowsMessage(badgeid, columns), true)
+        end
+    end
+
     for _, msg in ipairs(gBadgeNameCache) do
         Server.SendNetworkMessage(client, "BadgeName", msg, true)
     end
-    
+
 end
 
 local function OnClientDisconnect(client)
