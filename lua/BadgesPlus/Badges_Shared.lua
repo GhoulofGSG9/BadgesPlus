@@ -114,7 +114,7 @@ do
                 gBadges[badgeId] = badgeName
 
                 badgeData[badgeName] = {
-                    name = badgeName,
+                    name = "Custom Badge", --Todo Localize
                     unitStatusTexture = badgeFile,
                     scoreboardTexture = badgeFile,
                     columns = 16, --column 5
