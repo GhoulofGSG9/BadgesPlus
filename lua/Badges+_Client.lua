@@ -37,7 +37,7 @@ local function OnReceiveBadge( message )
 			Shared.ConsoleCommand( StringFormat( "badge \"%s\" %s", sBadge, row ))
 		end 
 	else
-		for i, func in ipairs( receiveBadges ) do
+		for _, func in ipairs( receiveBadges ) do
 			func( message )
 		end
 	end

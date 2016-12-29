@@ -7,6 +7,7 @@ kMaxBadgeColumns = 10
 
 --List of all avaible badges
 gBadges = {
+    "disabled",
     "none",
     "dev",
     "dev_retired",
@@ -108,7 +109,7 @@ do
         if not officialFiles[badgeFile] then
             local _, _, badgeName = string.find( badgeFile, "ui/badges/(.*).dds" )
 
-            if not officialFiles[badgeName] then --avoid custom badges named like official badges
+            if not officialFiles[badgeName] and not badgeData[badgeName] then --avoid custom badges named like official badges
                 local badgeId = #gBadges + 1
 
                 gBadges[badgeId] = badgeName

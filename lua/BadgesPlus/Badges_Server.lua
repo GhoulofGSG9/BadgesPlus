@@ -129,7 +129,7 @@ function Badges_SetBadge(clientId, badgeid, column)
     column = column or 5
 
     --verify ownership and column
-    if badgeid ~= gBadges.none and
+    if badgeid > gBadges.none and
             (not ownedbadges[badgeid] or bit.band(ownedbadges[badgeid], bit.lshift(1, column - 1)) == 0) then
         return false
     end
@@ -145,7 +145,7 @@ function Badges_SetBadge(clientId, badgeid, column)
         end
     end
 
-    if badgeid ~= gBadges.none then
+    if badgeid > gBadges.none then
         for rowId, badge in ipairs(clientBadges) do
             if badge == badgeid then
                 clientBadges[rowId] = gBadges.none
@@ -195,7 +195,7 @@ local function OnClientConnect(client)
     -- Send this client the badge info for all existing clients
     for clientId, badges in pairs(gClientId2Badges) do
         for column, badge in ipairs(badges) do
-            if badge ~= gBadges.none then
+            if badge > gBadges.none then
                 Server.SendNetworkMessage( client, "DisplayBadge", BuildDisplayBadgeMessage(clientId, badge, column), true )
             end
         end

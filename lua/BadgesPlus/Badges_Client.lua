@@ -49,12 +49,45 @@ Client.HookNetworkMessage("DisplayBadge",
         badgeNames[msg.clientId] = nil
     end)
 
+--Converts column bitmask into a list
+function Badges_GetBadgeColumns(bitmask)
+    local columns = {}
+    local acc = 1
+    for i = 1, kMaxBadgeColumns do
+        if bit.band(bitmask, acc) ~= 0 then
+            columns[#columns+1] = i
+        end
+
+        acc = acc * 2
+    end
+
+    return columns
+end
+
+--cache non empty columns
+local selectedRows = {}
+
 Client.HookNetworkMessage("BadgeRows",
     function(msg)
         if msg.columns == 0 then
             ownedBadges[msg.badge] = nil
         else
             ownedBadges[msg.badge] = msg.columns
+
+            --Check for empty columns and autoselect avaible badge
+            local columns = Badges_GetBadgeColumns(msg.columns)
+            for i = 1, #columns do
+                local column = columns[i]
+                if not selectedRows[column] then
+                    local badge = Client.GetOptionString( string.format("Badge%s", column), "" )
+                    if badge == "" or badge == "none" then
+                        SelectBadge(msg.badge, column)
+                        break
+                    else
+                        selectedRows[column] = true
+                    end
+                end
+            end
         end
     end)
 

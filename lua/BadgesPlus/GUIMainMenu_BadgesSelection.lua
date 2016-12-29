@@ -17,7 +17,7 @@ local function GetBadges()
 
             --check if we own the badge
             local ownedBadges = Badges_GetOwnedBadges()
-            badgeid = badgeid ~= gBadges.none and ownedBadges[badgeid] and badgeid or gBadges.none
+            badgeid = badgeid > gBadges.none and ownedBadges[badgeid] and badgeid or gBadges.none
 
             badgerow[i] = badgeid
             badges[badgeid] = true
@@ -39,20 +39,6 @@ function GUIBadgesSelection:ReloadBadgeOrder()
     self.playername:SetLeftOffset(GUIScale(10) + (i-1)* GUIScale(36))
 end
 
-function GUIBadgesSelection:GetBadgeRows(bitmask)
-    local columns = {}
-    local acc = 1
-    for i = 1, kMaxBadgeColumns do
-        if bit.band(bitmask, acc) ~= 0 then
-            columns[#columns+1] = i
-        end
-
-        acc = acc * 2
-    end
-
-    return columns
-end
-
 function GUIBadgesSelection:LoadBadges()
     local main = self
     local badges, selectedbadges = GetBadges()
@@ -60,7 +46,7 @@ function GUIBadgesSelection:LoadBadges()
     for i = 1, 10 do
         local badge = badges[i]
 
-        if badge and badge ~= gBadges.none then
+        if badge and badge > gBadges.none then
             local badgeTexture = Badges_GetBadgeData(badge).unitStatusTexture
             self.activeBadges[i].badgeId = badge
             self.activeBadges[i]:SetBackgroundTexture(badgeTexture)
@@ -82,7 +68,7 @@ function GUIBadgesSelection:LoadBadges()
     for _, badge in ipairs(gBadges) do
         local badgeid = gBadges[badge]
 
-        if badgeid ~= gBadges.none and ownedBadges[badgeid] and not selectedbadges[badgeid] then
+        if badgeid > gBadges.none and ownedBadges[badgeid] and not selectedbadges[badgeid] then
             i = i + 1
 
             self.avaibleBadges[i] = CreateMenuElement(self.avaibleRow, "Image")
@@ -98,7 +84,7 @@ function GUIBadgesSelection:LoadBadges()
 
             local activeBadges = self.activeBadges
             self.avaibleBadges[i].OnMouseDown = function(self)
-                local columns = main:GetBadgeRows(self.columns)
+                local columns = Badges_GetBadgeColumns(self.columns)
 
                 for i = 1, #columns do
                     activeBadges[columns[i]]:SetBackgroundTexture(self.badgeData.unitStatusTexture) --Todo proper highlight
@@ -113,7 +99,7 @@ function GUIBadgesSelection:LoadBadges()
             end
 
             self.avaibleBadges[i].OnMouseUp = function(self)
-                local columns = main:GetBadgeRows(self.columns)
+                local columns = Badges_GetBadgeColumns(self.columns)
                 local mouseX, mouseY = Client.GetCursorPosScreen()
 
                 for i = 1, #columns do
@@ -217,7 +203,7 @@ function GUIBadgesSelection:Initialize()
     for i = 1, 10 do
         self.activeBadges[i] = CreateMenuElement(self.activeBadgesBackground, "Image")
         self.activeBadges[i]:SetCSSClass("badge")
-        self.activeBadges[i]:AddEventCallbacks({ OnClick = function(self) SelectBadge(gBadges.none, i) main:LoadBadges() end })
+        self.activeBadges[i]:AddEventCallbacks({ OnClick = function(self) SelectBadge(gBadges.disabled, i) main:LoadBadges() end })
         self.activeBadges[i]:SetIsVisible(false)
     end
 
