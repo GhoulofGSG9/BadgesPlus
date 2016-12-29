@@ -61,11 +61,12 @@ function Badges_HasDevBadge(userId)
     return gClientIdDevs[userId]
 end
 
-function SetFormalBadgeName(badgeid, name)
+function SetFormalBadgeName(badgename, name)
+    local badgeid = gBadges[badgename]
     local setName = Badges_SetName(badgeid, name)
 
     if setName then
-        local msg = { badgeId = badgeid, name = name}
+        local msg = { badge = badgeid, name = name}
         gBadgeNameCache[#gBadgeNameCache + 1] = msg
         Server.SendNetworkMessage("BadgeName", msg, true)
 
