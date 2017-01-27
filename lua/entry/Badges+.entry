@@ -5,9 +5,11 @@ if Build < 312 then
         Server = "lua/Badges+_Server.lua",
         Priority = 100
     }
-else
+elseif Build == 312 then
     modEntry = {
         FileHooks = "lua/BadgesPlus/Badges+_Shared.lua",
         Priority = 51
     }
+else
+    modEntry = {}
 end
