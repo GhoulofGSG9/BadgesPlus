@@ -11,5 +11,8 @@ elseif Build == 312 then
         Priority = 51
     }
 else
-    modEntry = {}
+    modEntry = {
+        Server = "lua/hotfix_344/Badges+_Server.lua",
+        Priority = 100
+    }
 end
